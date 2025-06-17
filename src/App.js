@@ -14,10 +14,10 @@ const App = () => {
   // ショー名を短縮形に変換
   const getShortShowName = (showCode) => {
     const shortNames = {
-      'BBB': 'ビッグバンド',
-      'MMW': 'マジカル', 
-      'CMB': 'クラブマウス',
-      'DTF': 'ドリームス'
+      'BBB': 'ビッグバンドビート～ア・スペシャルトリート～',
+      'MMW': 'ミッキーのマジカルミュージックワールド', 
+      'CMB': 'クラブマウスビート',
+      'DTF': 'ドリームス・テイク・フライト'
     };
     return shortNames[showCode] || showCode;
   };
@@ -76,11 +76,11 @@ const App = () => {
     };
     
     if (status === 'available') {
-      return <span className={`text-green-500 ${sizeClasses[size]}`}>⭕</span>;
+      return <span className={`text-green-600 ${sizeClasses[size]}`}>⭕</span>;
     } else if (status === 'sold-out') {
-      return <span className={`text-red-500 ${sizeClasses[size]}`}>❌</span>;
+      return <span className={`text-red-600 ${sizeClasses[size]}`}>❌</span>;
     }
-    return <span className={`text-gray-400 ${sizeClasses[size]}`}>?</span>;
+    return <span className={`text-gray-500 ${sizeClasses[size]}`}>?</span>;
   };
 
   const toggleShowExpansion = (showKey) => {
@@ -106,22 +106,19 @@ const App = () => {
     const showKey = `${date}-${showCode}`;
     const isExpanded = expandedShows.has(showKey);
     const shortName = getShortShowName(showCode);
-
-    // ショー全体のステータスを判定
     const showStatuses = show.performances?.map(p => p.status || 'unknown') || [];
-    const overallStatus = showStatuses.includes('sold-out') 
-      ? 'sold-out' 
-      : showStatuses.includes('available') 
-      ? 'available' 
+    const overallStatus = showStatuses.includes('available')
+      ? 'available'
+      : showStatuses.every(s => s === 'sold-out') && showStatuses.length > 0
+      ? 'sold-out'
       : 'unknown';
-
     return (
-      <div className="border rounded overflow-hidden bg-white shadow-sm">
+      <div className="border border-blue-100 rounded-lg overflow-hidden bg-white shadow-sm">
         <div 
-          className="flex items-center justify-between p-2 cursor-pointer hover:bg-gray-50 transition-colors"
+          className="flex items-center justify-between p-2 cursor-pointer hover:bg-blue-50 transition-colors"
           onClick={() => toggleShowExpansion(showKey)}
         >
-          <span className="text-xs font-medium truncate flex-1 mr-1">{shortName}</span>
+          <span className="text-sm font-medium truncate flex-1 mr-1 text-gray-800">{shortName}</span>
           <div className="flex items-center space-x-1">
             <StatusIcon status={overallStatus} size="md" />
             <svg 
@@ -134,9 +131,8 @@ const App = () => {
             </svg>
           </div>
         </div>
-
         {isExpanded && (
-          <div className="border-t bg-gray-50">
+          <div className="border-t border-blue-100 bg-blue-50">
             <div className="p-2">
               <h4 className="text-xs font-semibold text-gray-700 mb-1 truncate">{show.fullShowName}</h4>
               <div className="space-y-1">
@@ -158,11 +154,11 @@ const App = () => {
 
   const DayCard = ({ date, shows }) => {
     return (
-      <div className="border border-gray-300 rounded-lg p-2 bg-white">
-        <div className="text-center text-sm font-bold mb-2 text-gray-700">
+      <div className="border border-blue-200 rounded-lg p-4 bg-white shadow-sm mb-4">
+        <div className="text-center text-base font-bold mb-3 text-gray-800">
           {date}日
         </div>
-        <div className="space-y-1">
+        <div className="space-y-2">
           {Object.entries(shows).map(([showCode, showData]) => (
             <ShowCard
               key={`${date}-${showCode}`}
@@ -177,34 +173,29 @@ const App = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-2 sm:p-3 lg:p-4">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-center mb-3 lg:mb-4 text-gray-800">
+    <div className="min-h-screen" style={{ backgroundColor: '#d6f6fb' }}>
+      <div className="max-w-3xl mx-auto py-6 px-2">
+        <h1 className="text-xl font-bold text-center mb-6 rounded-lg" style={{ background: '#009fe8', color: 'white', padding: '0.75rem 0' }}>
           チケット販売状況確認ページ
         </h1>
-        
-        <div className="mb-3 lg:mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
           <div className="flex items-center space-x-2">
             <select
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
-              className="border border-gray-300 rounded px-2 py-1 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              className="border border-blue-300 rounded px-3 py-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-800"
               disabled={loading}
             >
               <option value="7">7月</option>
               <option value="8">8月</option>
               <option value="9">9月</option>
             </select>
-            
             {loading && (
-              <span className="text-blue-600 text-xs">
-                読込中...
-              </span>
+              <span className="text-blue-600 text-xs">読込中...</span>
             )}
           </div>
-
           {summary && summary.totalTickets > 0 && (
-            <div className="text-xs text-gray-600 bg-white px-2 py-1 rounded border">
+            <div className="text-xs bg-white px-3 py-1 rounded border border-blue-200 text-gray-800">
               <span className="hidden sm:inline">総公演: {summary.totalTickets} | </span>
               <span className="text-green-600">空席: {summary.available}</span> | 
               <span className="text-red-600">完売: {summary.soldOut}</span>
@@ -212,9 +203,8 @@ const App = () => {
             </div>
           )}
         </div>
-
         {error && (
-          <div className="mb-3 p-3 bg-red-100 border border-red-300 rounded-lg">
+          <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-red-700 text-sm">
               <strong>エラー:</strong> {error}
             </p>
@@ -226,29 +216,23 @@ const App = () => {
             </button>
           </div>
         )}
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 lg:gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {Object.entries(calendarData)
             .sort(([a], [b]) => parseInt(a) - parseInt(b))
             .map(([date, shows]) => (
               <DayCard key={`day-${date}`} date={date} shows={shows} />
             ))}
         </div>
-
         {Object.keys(calendarData).length === 0 && !loading && !error && (
           <div className="text-center py-8">
-            <p className="text-gray-500 text-sm lg:text-base">
+            <p className="text-gray-600 text-sm lg:text-base">
               {selectedMonth}月の公演データがありません
             </p>
-            <p className="text-gray-400 text-xs mt-1">
+            <p className="text-gray-500 text-xs mt-1">
               APIからデータを取得中です...
             </p>
           </div>
         )}
-
-        <div className="mt-4 lg:mt-6 text-center text-xs text-gray-500">
-          <p>⭕ 空席あり / ❌ 完売</p>
-        </div>
       </div>
     </div>
   );
