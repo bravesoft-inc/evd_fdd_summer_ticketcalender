@@ -105,13 +105,22 @@ const App = () => {
       : showStatuses.every(s => s === 'sold-out') && showStatuses.length > 0
       ? 'sold-out'
       : 'unknown';
+
+    // ビッグバンドビートだけ改行表示
+    let displayShortName;
+    if (shortName === 'ビッグバンドビート～ア・スペシャルトリート～') {
+      displayShortName = <span>ビッグバンドビート<br />～ア・スペシャルトリート～</span>;
+    } else {
+      displayShortName = shortName;
+    }
+
     return (
       <div className="border border-blue-100 rounded-lg overflow-hidden bg-white shadow-sm">
         <div 
           className="flex items-center justify-between p-2 cursor-pointer hover:bg-blue-50 transition-colors"
           onClick={() => toggleShowExpansion(showKey)}
         >
-          <span className="text-xs font-medium flex-1 mr-1 text-gray-800">{shortName}</span>
+          <span className="text-xs font-medium flex-1 mr-1 text-gray-800">{displayShortName}</span>
           <div className="flex items-center space-x-1">
             <StatusIcon status={overallStatus} size="md" />
             <svg 
@@ -173,14 +182,27 @@ const App = () => {
     'MMW': 'land',
   };
 
-  // フィルターUI
-  const showFilterOptions = [
+  // 全ショーリスト
+  const allShowFilterOptions = [
     { code: 'all', name: 'すべてのショー' },
-    { code: 'CMB', name: 'クラブマウスビート' },
-    { code: 'MMW', name: 'ミッキーのマジカルミュージックワールド' },
-    { code: 'BBB', name: 'ビッグバンドビート～ア・スペシャルトリート～' },
-    { code: 'DTF', name: 'ドリームス・テイク・フライト' },
+    { code: 'CMB', name: 'クラブマウスビート', park: 'land' },
+    { code: 'MMW', name: 'ミッキーのマジカルミュージックワールド', park: 'land' },
+    { code: 'BBB', name: 'ビッグバンドビート～ア・スペシャルトリート～', park: 'sea' },
+    { code: 'DTF', name: 'ドリームス・テイク・フライト', park: 'sea' },
   ];
+
+  // パークに応じたショーフィルターリスト
+  const showFilterOptions = selectedPark === 'all'
+    ? allShowFilterOptions
+    : allShowFilterOptions.filter(opt => opt.code === 'all' || opt.park === selectedPark);
+
+  // パーク切り替え時に選択中ショーが対象外ならリセット
+  useEffect(() => {
+    if (selectedShow !== 'all' && !showFilterOptions.some(opt => opt.code === selectedShow)) {
+      setSelectedShow('all');
+    }
+    // eslint-disable-next-line
+  }, [selectedPark]);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#d6f6fb' }}>
@@ -205,25 +227,31 @@ const App = () => {
             )}
           </div>
         </div>
-        <div className="mb-4 flex flex-wrap gap-2 items-center justify-center">
-          <select
-            value={selectedPark}
-            onChange={e => setSelectedPark(e.target.value)}
-            className="border border-blue-300 rounded px-2 py-1 text-xs text-gray-800"
-          >
-            <option value="all">全て</option>
-            <option value="land">ディズニーランド</option>
-            <option value="sea">ディズニーシー</option>
-          </select>
-          <select
-            value={selectedShow}
-            onChange={e => setSelectedShow(e.target.value)}
-            className="border border-blue-300 rounded px-2 py-1 text-xs text-gray-800"
-          >
-            {showFilterOptions.map(opt => (
-              <option key={opt.code} value={opt.code}>{opt.name}</option>
-            ))}
-          </select>
+        <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-center gap-2 sm:gap-4 px-1">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 w-full sm:w-auto">
+            <select
+              id="park-filter"
+              value={selectedPark}
+              onChange={e => setSelectedPark(e.target.value)}
+              className="border border-blue-300 rounded px-2 py-1 text-xs text-gray-800 w-full sm:w-auto"
+            >
+              <option value="all">全てのパーク</option>
+              <option value="land">ディズニーランド</option>
+              <option value="sea">ディズニーシー</option>
+            </select>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 w-full sm:w-auto">
+            <select
+              id="show-filter"
+              value={selectedShow}
+              onChange={e => setSelectedShow(e.target.value)}
+              className="border border-blue-300 rounded px-2 py-1 text-xs text-gray-800 w-full sm:w-auto"
+            >
+              {showFilterOptions.map(opt => (
+                <option key={opt.code} value={opt.code}>{opt.name}</option>
+              ))}
+            </select>
+          </div>
         </div>
         {error && (
           <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
