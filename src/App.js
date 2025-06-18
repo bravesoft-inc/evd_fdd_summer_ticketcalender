@@ -72,6 +72,8 @@ const App = () => {
       return <span className={`text-blue-400 ${sizeClasses[size]}`}>○</span>;
     } else if (status === 'sold-out') {
       return <span className={`text-blue-400 ${sizeClasses[size]}`}>×</span>;
+    } else if (status === 'pre-sale') {
+      return <span className={`text-gray-400 ${sizeClasses[size]}`}>-</span>;
     }
     return <span className={`text-blue-400 ${sizeClasses[size]}`}>?</span>;
   };
@@ -100,11 +102,18 @@ const App = () => {
     const isExpanded = expandedShows.has(showKey);
     const shortName = getShortShowName(showCode);
     const showStatuses = show.performances?.map(p => p.status || 'unknown') || [];
-    const overallStatus = showStatuses.includes('available')
-      ? 'available'
-      : showStatuses.every(s => s === 'sold-out') && showStatuses.length > 0
-      ? 'sold-out'
-      : 'unknown';
+    
+    // 全体状態の判定を更新
+    let overallStatus;
+    if (showStatuses.includes('pre-sale') && showStatuses.every(s => s === 'pre-sale' || s === 'unknown')) {
+      overallStatus = 'pre-sale';
+    } else if (showStatuses.includes('available')) {
+      overallStatus = 'available';
+    } else if (showStatuses.every(s => s === 'sold-out') && showStatuses.length > 0) {
+      overallStatus = 'sold-out';
+    } else {
+      overallStatus = 'unknown';
+    }
 
     // ビッグバンドビートだけ改行表示
     let displayShortName;
@@ -120,11 +129,11 @@ const App = () => {
           className="flex items-center justify-between p-2 cursor-pointer hover:bg-blue-50 transition-colors"
           onClick={() => toggleShowExpansion(showKey)}
         >
-          <span className="text-xs font-medium flex-1 mr-1 text-gray-800">{displayShortName}</span>
-          <div className="flex items-center space-x-1">
+          <div className="flex items-center w-full">
+            <span className="text-xs font-medium flex-1 mr-1 text-gray-800">{displayShortName}</span>
             <StatusIcon status={overallStatus} size="md" />
             <svg 
-              className={`w-3 h-3 text-gray-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+              className={`w-3 h-3 text-gray-500 transition-transform ml-1 ${isExpanded ? 'rotate-180' : ''}`}
               fill="none" 
               stroke="currentColor" 
               viewBox="0 0 24 24"
@@ -207,9 +216,6 @@ const App = () => {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#d6f6fb' }}>
       <div className="max-w-4xl mx-auto py-6 px-2">
-        {/* <h1 className="text-xl font-bold text-center mb-6 rounded-lg" style={{ background: '#009fe8', color: 'white', padding: '0.75rem 0' }}>
-          チケット販売状況確認ページ
-        </h1> */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
           <div className="flex items-center space-x-2">
             <select
@@ -253,6 +259,25 @@ const App = () => {
             </select>
           </div>
         </div>
+        
+        {/* ステータス凡例を追加 */}
+        <div className="mb-4 p-3 bg-white rounded-lg border border-blue-200">
+          <div className="flex flex-wrap gap-4 text-xs text-gray-700">
+            <div className="flex items-center gap-1">
+              <span className="text-blue-400 text-lg">○</span>
+              <span>空席あり</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="text-blue-400 text-lg">×</span>
+              <span>満席</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="text-gray-400 text-lg">-</span>
+              <span>販売前</span>
+            </div>
+          </div>
+        </div>
+
         {error && (
           <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-red-700 text-sm">
