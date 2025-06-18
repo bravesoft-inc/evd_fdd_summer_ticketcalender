@@ -223,6 +223,7 @@ const App = () => {
 
   // パークタブ用
   const parkTabs = [
+    { value: 'all', label: '全て' },
     { value: 'land', label: '東京ディズニーランド' },
     { value: 'sea', label: '東京ディズニーシー' },
   ];
@@ -248,14 +249,14 @@ const App = () => {
         </div>
         {/* パークタブ */}
         <div className="mb-4 flex justify-center">
-          <div className="inline-flex border border-gray-300 rounded-lg overflow-hidden">
+          <div className="flex border border-gray-300 rounded-lg overflow-hidden w-full max-w-md">
             {parkTabs.map(tab => (
               <button
                 key={tab.value}
                 onClick={() => setSelectedPark(tab.value)}
-                className={`px-6 py-2 text-sm font-medium focus:outline-none transition-all
+                className={`flex-1 flex flex-col justify-center items-center px-6 py-2 text-[10px] font-medium whitespace-nowrap focus:outline-none transition-all
                   ${selectedPark === tab.value ? 'bg-pink-500 text-white' : 'bg-white text-gray-700'}`}
-                style={{ borderRight: tab.value === 'land' ? '1px solid #ddd' : undefined }}
+                style={{ minWidth: '120px', borderRight: tab.value !== 'sea' ? '1px solid #ddd' : undefined }}
               >
                 {tab.label}
               </button>
@@ -309,9 +310,6 @@ const App = () => {
           <div className="text-center py-8">
             <p className="text-gray-600 text-sm lg:text-base">
               {selectedMonth}月の公演データがありません
-            </p>
-            <p className="text-gray-500 text-xs mt-1">
-              APIからデータを取得中です...
             </p>
           </div>
         )}
