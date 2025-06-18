@@ -213,52 +213,67 @@ const App = () => {
     // eslint-disable-next-line
   }, [selectedPark]);
 
+  // 月リスト
+  const months = [
+    { value: '7', label: '7月' },
+    { value: '8', label: '8月' },
+    { value: '9', label: '9月' },
+  ];
+  const year = 2025;
+
+  // パークタブ用
+  const parkTabs = [
+    { value: 'land', label: '東京ディズニーランド' },
+    { value: 'sea', label: '東京ディズニーシー' },
+  ];
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#d6f6fb' }}>
       <div className="max-w-4xl mx-auto py-6 px-2">
-        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
-          <div className="flex items-center space-x-2">
-            <select
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              className="border border-blue-300 rounded px-3 py-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-800"
-              disabled={loading}
-            >
-              <option value="7">7月</option>
-              <option value="8">8月</option>
-              <option value="9">9月</option>
-            </select>
-            {loading && (
-              <span className="text-blue-600 text-xs">読込中...</span>
-            )}
+        {/* 月選択 */}
+        <div className="mb-4">
+          <div className="text-xs text-gray-500 mb-1 pl-2">{year}年</div>
+          <div className="flex gap-4 border-b border-gray-300 pb-2">
+            {months.map(m => (
+              <button
+                key={m.value}
+                onClick={() => setSelectedMonth(m.value)}
+                className={`px-3 py-1 rounded-full text-base font-medium focus:outline-none transition-all
+                  ${selectedMonth === m.value ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100'}`}
+              >
+                {m.label}
+              </button>
+            ))}
           </div>
         </div>
-        <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-center gap-2 sm:gap-4 px-1">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 w-full sm:w-auto">
-            <select
-              id="park-filter"
-              value={selectedPark}
-              onChange={e => setSelectedPark(e.target.value)}
-              className="border border-blue-300 rounded px-2 py-1 text-xs text-gray-800 w-full sm:w-auto"
-            >
-              <option value="all">全てのパーク</option>
-              <option value="land">ディズニーランド</option>
-              <option value="sea">ディズニーシー</option>
-            </select>
-          </div>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 w-full sm:w-auto">
-            <select
-              id="show-filter"
-              value={selectedShow}
-              onChange={e => setSelectedShow(e.target.value)}
-              className="border border-blue-300 rounded px-2 py-1 text-xs text-gray-800 w-full sm:w-auto"
-            >
-              {showFilterOptions.map(opt => (
-                <option key={opt.code} value={opt.code}>{opt.name}</option>
-              ))}
-            </select>
+        {/* パークタブ */}
+        <div className="mb-4 flex justify-center">
+          <div className="inline-flex border border-gray-300 rounded-lg overflow-hidden">
+            {parkTabs.map(tab => (
+              <button
+                key={tab.value}
+                onClick={() => setSelectedPark(tab.value)}
+                className={`px-6 py-2 text-sm font-medium focus:outline-none transition-all
+                  ${selectedPark === tab.value ? 'bg-pink-500 text-white' : 'bg-white text-gray-700'}`}
+                style={{ borderRight: tab.value === 'land' ? '1px solid #ddd' : undefined }}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
         </div>
+        {/* ショーセレクト */}
+        {/* <div className="mb-6 flex justify-center">
+          <select
+            value={selectedShow}
+            onChange={e => setSelectedShow(e.target.value)}
+            className="border border-blue-300 rounded px-3 py-2 text-sm text-gray-800 min-w-[200px]"
+          >
+            {showFilterOptions.map(opt => (
+              <option key={opt.code} value={opt.code}>{opt.name}</option>
+            ))}
+          </select>
+        </div> */}
         
         {/* ステータス凡例を追加 */}
         <div className="mb-4 p-3 bg-white rounded-lg border border-blue-200">
