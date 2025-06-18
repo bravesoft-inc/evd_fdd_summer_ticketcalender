@@ -274,24 +274,7 @@ const App = () => {
             ))}
           </select>
         </div> */}
-        
-        {/* ステータス凡例を追加 */}
-        <div className="mb-4 p-3 bg-white rounded-lg border border-blue-200">
-          <div className="flex flex-wrap gap-4 text-xs text-gray-700">
-            <div className="flex items-center gap-1">
-              <span className="text-blue-400 text-lg">○</span>
-              <span>空席あり</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="text-blue-400 text-lg">×</span>
-              <span>満席</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="text-gray-400 text-lg">-</span>
-              <span>販売前</span>
-            </div>
-          </div>
-        </div>
+      
 
         {error && (
           <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
@@ -332,6 +315,23 @@ const App = () => {
             </p>
           </div>
         )}
+                {/* ステータス凡例を追加 */}
+                <div className="mb-4 p-3 bg-white rounded-lg border border-blue-200">
+          <div className="flex flex-wrap gap-4 text-xs text-gray-700">
+            <div className="flex items-center gap-1">
+              <span className="text-blue-400 text-lg">○</span>
+              <span>空席あり</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="text-blue-400 text-lg">×</span>
+              <span>満席</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="text-gray-400 text-lg">-</span>
+              <span>販売前</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
