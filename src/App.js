@@ -9,7 +9,6 @@ const App = () => {
   const [expandedShows, setExpandedShows] = useState(new Set());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [summary, setSummary] = useState({});
 
   // ショー名を短縮形に変換
   const getShortShowName = (showCode) => {
@@ -47,18 +46,10 @@ const App = () => {
         setCalendarData({});
       }
       
-      // サマリー情報を設定
-      if (apiData.summary) {
-        setSummary(apiData.summary);
-      } else {
-        setSummary({});
-      }
-      
     } catch (error) {
       console.error('Error fetching data:', error);
       setError(error.message);
       setCalendarData({});
-      setSummary({});
     } finally {
       setLoading(false);
     }
@@ -76,9 +67,9 @@ const App = () => {
     };
     
     if (status === 'available') {
-      return <span className={`text-green-600 ${sizeClasses[size]}`}>⭕</span>;
+      return <span className={`text-gray-600 ${sizeClasses[size]}`}>○</span>;
     } else if (status === 'sold-out') {
-      return <span className={`text-red-600 ${sizeClasses[size]}`}>❌</span>;
+      return <span className={`text-gray-600 ${sizeClasses[size]}`}>×</span>;
     }
     return <span className={`text-gray-500 ${sizeClasses[size]}`}>?</span>;
   };
@@ -175,9 +166,9 @@ const App = () => {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#d6f6fb' }}>
       <div className="max-w-3xl mx-auto py-6 px-2">
-        <h1 className="text-xl font-bold text-center mb-6 rounded-lg" style={{ background: '#009fe8', color: 'white', padding: '0.75rem 0' }}>
+        {/* <h1 className="text-xl font-bold text-center mb-6 rounded-lg" style={{ background: '#009fe8', color: 'white', padding: '0.75rem 0' }}>
           チケット販売状況確認ページ
-        </h1>
+        </h1> */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
           <div className="flex items-center space-x-2">
             <select
@@ -194,14 +185,6 @@ const App = () => {
               <span className="text-blue-600 text-xs">読込中...</span>
             )}
           </div>
-          {summary && summary.totalTickets > 0 && (
-            <div className="text-xs bg-white px-3 py-1 rounded border border-blue-200 text-gray-800">
-              <span className="hidden sm:inline">総公演: {summary.totalTickets} | </span>
-              <span className="text-green-600">空席: {summary.available}</span> | 
-              <span className="text-red-600">完売: {summary.soldOut}</span>
-              {summary.unknown > 0 && <span className="text-gray-500"> | 不明: {summary.unknown}</span>}
-            </div>
-          )}
         </div>
         {error && (
           <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
