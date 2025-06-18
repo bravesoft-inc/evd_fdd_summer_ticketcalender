@@ -9,6 +9,8 @@ const App = () => {
   const [expandedShows, setExpandedShows] = useState(new Set());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [selectedPark, setSelectedPark] = useState('all'); // 'all', 'land', 'sea'
+  const [selectedShow, setSelectedShow] = useState('all'); // 'all' or showCode
 
   // ショー名を短縮形に変換
   const getShortShowName = (showCode) => {
@@ -67,11 +69,11 @@ const App = () => {
     };
     
     if (status === 'available') {
-      return <span className={`text-gray-600 ${sizeClasses[size]}`}>○</span>;
+      return <span className={`text-blue-400 ${sizeClasses[size]}`}>○</span>;
     } else if (status === 'sold-out') {
-      return <span className={`text-gray-600 ${sizeClasses[size]}`}>×</span>;
+      return <span className={`text-blue-400 ${sizeClasses[size]}`}>×</span>;
     }
-    return <span className={`text-gray-500 ${sizeClasses[size]}`}>?</span>;
+    return <span className={`text-blue-400 ${sizeClasses[size]}`}>?</span>;
   };
 
   const toggleShowExpansion = (showKey) => {
@@ -109,7 +111,7 @@ const App = () => {
           className="flex items-center justify-between p-2 cursor-pointer hover:bg-blue-50 transition-colors"
           onClick={() => toggleShowExpansion(showKey)}
         >
-          <span className="text-sm font-medium truncate flex-1 mr-1 text-gray-800">{shortName}</span>
+          <span className="text-xs font-medium flex-1 mr-1 text-gray-800">{shortName}</span>
           <div className="flex items-center space-x-1">
             <StatusIcon status={overallStatus} size="md" />
             <svg 
@@ -163,9 +165,26 @@ const App = () => {
     );
   };
 
+  // ショーのパーク分類
+  const parkMap = {
+    'BBB': 'sea',
+    'DTF': 'sea',
+    'CMB': 'land',
+    'MMW': 'land',
+  };
+
+  // フィルターUI
+  const showFilterOptions = [
+    { code: 'all', name: 'すべてのショー' },
+    { code: 'CMB', name: 'クラブマウスビート' },
+    { code: 'MMW', name: 'ミッキーのマジカルミュージックワールド' },
+    { code: 'BBB', name: 'ビッグバンドビート～ア・スペシャルトリート～' },
+    { code: 'DTF', name: 'ドリームス・テイク・フライト' },
+  ];
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#d6f6fb' }}>
-      <div className="max-w-3xl mx-auto py-6 px-2">
+      <div className="max-w-4xl mx-auto py-6 px-2">
         {/* <h1 className="text-xl font-bold text-center mb-6 rounded-lg" style={{ background: '#009fe8', color: 'white', padding: '0.75rem 0' }}>
           チケット販売状況確認ページ
         </h1> */}
@@ -186,6 +205,26 @@ const App = () => {
             )}
           </div>
         </div>
+        <div className="mb-4 flex flex-wrap gap-2 items-center justify-center">
+          <select
+            value={selectedPark}
+            onChange={e => setSelectedPark(e.target.value)}
+            className="border border-blue-300 rounded px-2 py-1 text-xs text-gray-800"
+          >
+            <option value="all">全て</option>
+            <option value="land">ディズニーランド</option>
+            <option value="sea">ディズニーシー</option>
+          </select>
+          <select
+            value={selectedShow}
+            onChange={e => setSelectedShow(e.target.value)}
+            className="border border-blue-300 rounded px-2 py-1 text-xs text-gray-800"
+          >
+            {showFilterOptions.map(opt => (
+              <option key={opt.code} value={opt.code}>{opt.name}</option>
+            ))}
+          </select>
+        </div>
         {error && (
           <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-red-700 text-sm">
@@ -199,12 +238,21 @@ const App = () => {
             </button>
           </div>
         )}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 gap-y-1">
           {Object.entries(calendarData)
             .sort(([a], [b]) => parseInt(a) - parseInt(b))
-            .map(([date, shows]) => (
-              <DayCard key={`day-${date}`} date={date} shows={shows} />
-            ))}
+            .map(([date, shows]) => {
+              // フィルター適用
+              const filteredShows = Object.entries(shows).filter(([showCode]) => {
+                if (selectedPark !== 'all' && parkMap[showCode] !== selectedPark) return false;
+                if (selectedShow !== 'all' && showCode !== selectedShow) return false;
+                return true;
+              });
+              if (filteredShows.length === 0) return null;
+              return (
+                <DayCard key={`day-${date}`} date={date} shows={Object.fromEntries(filteredShows)} />
+              );
+            })}
         </div>
         {Object.keys(calendarData).length === 0 && !loading && !error && (
           <div className="text-center py-8">
